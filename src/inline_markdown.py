@@ -1,4 +1,5 @@
 from textnode import TextNode, TextType
+import re
 
 def split_nodes_delimiter(old_nodes, delimiter, text_type):
     new_nodes = []
@@ -28,3 +29,23 @@ def split_nodes_delimiter(old_nodes, delimiter, text_type):
         new_nodes.extend(split_nodes)
         
     return new_nodes
+
+def extract_markdown_images(text):
+    # Regex breakdown:
+    # !\[      -> matches the literal '!['
+    # (.*?)    -> non-greedy capture group for the alt text
+    # \]       -> matches the literal ']'
+    # \(       -> matches the literal '('
+    # (.*?)    -> non-greedy capture group for the URL
+    # \)       -> matches the literal ')'
+    pattern = r"!\[(.*?)\]\((.*?)\)"
+    matches = re.findall(pattern, text)
+    return matches
+
+def extract_markdown_links(text):
+    # Same as above, but without the leading '!'
+    # We use a negative lookbehind (?<!!) to ensure we don't accidentally
+    # match an image as a link.
+    pattern = r"(?<!!)\[(.*?)\]\((.*?)\)"
+    matches = re.findall(pattern, text)
+    return matches
