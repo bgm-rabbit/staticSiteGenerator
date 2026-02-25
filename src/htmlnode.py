@@ -30,14 +30,10 @@ class LeafNode(HTMLNode):
         super().__init__(tag, value, None, props)
     
     def to_html(self):
-        if not self.value:
-            raise ValueError("All leaf nodes must have a value")
-        
-        # If there is no tag, return the value as raw text
-        if not self.tag:
+        if self.value is None: # Only error if it's LITERALLY None
+            raise ValueError("Invalid HTML: no value")
+        if self.tag is None:
             return self.value
-        
-        # Otherwise, render as an HTML tag with properties and the value
         return f"<{self.tag}{self.props_to_html()}>{self.value}</{self.tag}>"
     
     def __repr__(self):
@@ -48,17 +44,15 @@ class ParentNode(HTMLNode):
         super().__init__(tag, None, children, props)
     
     def to_html(self):
-        if not self.tag:
-            raise ValueError("All parent nodes must have a tag")
+        if self.tag is None:
+            raise ValueError("Invalid HTML: no tag")
+        if self.children is None: # Only error if children is LITERALLY None
+            raise ValueError("Invalid HTML: no children")
         
-        if not self.children:
-            raise ValueError("All parent nodes must have children")
-        
-        # Recursive step: call to_html() on every child and join the results
+        # An empty list [] should NOT raise an error; it just loops zero times
         children_html = ""
         for child in self.children:
             children_html += child.to_html()
-            
         return f"<{self.tag}{self.props_to_html()}>{children_html}</{self.tag}>"
 
     def __repr__(self):
