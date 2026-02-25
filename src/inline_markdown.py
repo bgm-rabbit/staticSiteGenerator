@@ -105,3 +105,19 @@ def split_nodes_link(old_nodes):
             new_nodes.append(TextNode(original_text, TextType.PLAIN))
             
     return new_nodes
+
+def text_to_textnodes(text):
+    # Start with a single PLAIN node containing the whole string
+    nodes = [TextNode(text, TextType.PLAIN)]
+    
+    # Process delimiters in a logical sequence
+    # Note: Split bold (**) before italic (*) to prevent partial matches
+    nodes = split_nodes_delimiter(nodes, "**", TextType.BOLD)
+    nodes = split_nodes_delimiter(nodes, "*", TextType.ITALIC)
+    nodes = split_nodes_delimiter(nodes, "`", TextType.CODE)
+    
+    # Process images and links
+    nodes = split_nodes_image(nodes)
+    nodes = split_nodes_link(nodes)
+    
+    return nodes
